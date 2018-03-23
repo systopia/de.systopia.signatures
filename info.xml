@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<extension key="de.systopia.signatures" type="module">
+  <file>signatures</file>
+  <name>Signatures</name>
+  <description>Provides configurable signatures per contact to be used in e-mails and letters, for single and mass mailings.</description>
+  <license>AGPL-3.0</license>
+  <maintainer>
+    <author>Jens Schuppe</author>
+    <email>schuppe@systopia.de</email>
+  </maintainer>
+  <urls>
+    <url desc="Main Extension Page">http://FIXME</url>
+    <url desc="Documentation">http://FIXME</url>
+    <url desc="Support">http://FIXME</url>
+    <url desc="Licensing">http://www.gnu.org/licenses/agpl-3.0.html</url>
+  </urls>
+  <releaseDate>2018-03-23</releaseDate>
+  <version>0.1.dev</version>
+  <develStage>dev</develStage>
+  <compatibility>
+    <ver>4.7</ver>
+  </compatibility>
+  <comments></comments>
+  <civix>
+    <namespace>CRM/Signatures</namespace>
+  </civix>
+</extension>
