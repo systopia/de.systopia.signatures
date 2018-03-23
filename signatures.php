@@ -150,3 +150,38 @@ function signatures_civicrm_navigationMenu(&$menu) {
   ));
   _signatures_civix_navigationMenu($menu);
 }
+
+/**
+ * Implements hook_civicrm_tokens().
+ *
+ * @link http://wiki.civicrm.org/confluence/display/CRMDOC/hook_civicrm_tokens
+ */
+function signatures_civicrm_tokens(&$tokens) {
+  foreach (CRM_Signatures_Signatures::allowedSignatures() as $signature_type => $signature_label) {
+    $tokens['signatures']['signatures.' . $signature_type] = $signature_label;
+  }
+}
+
+/**
+ * Implements hook_civicrm_tokenValues().
+ *
+ * @link http://wiki.civicrm.org/confluence/display/CRMDOC/hook_civicrm_tokenValues
+ */
+function signatures_civicrm_tokenValues(&$values, $cids, $job = null, $tokens = array(), $context = null) {
+  // We want the logged-in, or the mass mailing creator contact's signatures.
+  if (!($contact_id = CRM_Core_Session::singleton()->getLoggedInContactID()) && !empty($job) && !empty($context)) {
+    if ($job_object = call_user_func_array(array($context, 'findById'), array($job))) {
+      if ($mailing = CRM_Mailing_BAO_Mailing::findById($job_object->mailing_id)) {
+        $contact_id = $mailing->created_id;
+      }
+    }
+  }
+
+  if ($signatures = CRM_Signatures_Signatures::getSignatures($contact_id)) {
+    foreach ($cids as $cid) {
+      foreach ($signatures->getData() as $signature_name => $signature_body) {
+        $values[$cid]['signatures.' . $signature_name] = $signature_body;
+      }
+    }
+  }
+}

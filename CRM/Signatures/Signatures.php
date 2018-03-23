@@ -49,7 +49,7 @@ class CRM_Signatures_Signatures {
    */
   public function __construct($contact_id, $data = array()) {
     $this->contact_id = $contact_id;
-    $allowed_signatures = self::allowedSignatures();
+    $allowed_signatures = array_keys(self::allowedSignatures());
     $this->data = $data + array_combine(
         $allowed_signatures,
         array_fill(0, count($allowed_signatures), '')
@@ -109,7 +109,7 @@ class CRM_Signatures_Signatures {
    *   When the signature name is not known.
    */
   public function setSignature($signature_name, $signature_body) {
-    if (!in_array($signature_name, self::allowedSignatures())) {
+    if (!in_array($signature_name, array_keys(self::allowedSignatures()))) {
       throw new Exception("Unknown signature name {$signature_name}.");
     }
     // TODO: Check if value is acceptable.
@@ -150,11 +150,11 @@ class CRM_Signatures_Signatures {
    */
   public static function allowedSignatures() {
     return array(
-      'signature_letter_html',
-      'signature_email_html',
-      'signature_email_plain',
-      'signature_mass_mailing_html',
-      'signature_mass_mailing_plain',
+      'signature_letter_html' => ts('Letter signature (HTML)', array('domain' => 'de.systopia.signatures')),
+      'signature_email_html' => ts('E-mail signature (HTML)', array('domain' => 'de.systopia.signatures')),
+      'signature_email_plain' => ts('E-mail signature (plain text)', array('domain' => 'de.systopia.signatures')),
+      'signature_mass_mailing_html' => ts('Mass mailing signature (HTML)', array('domain' => 'de.systopia.signatures')),
+      'signature_mass_mailing_plain' => ts('Mass mailing signature (plain text)', array('domain' => 'de.systopia.signatures')),
     );
   }
 
