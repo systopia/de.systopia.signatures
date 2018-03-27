@@ -168,19 +168,44 @@ function signatures_civicrm_tokens(&$tokens) {
  * @link http://wiki.civicrm.org/confluence/display/CRMDOC/hook_civicrm_tokenValues
  */
 function signatures_civicrm_tokenValues(&$values, $cids, $job = null, $tokens = array(), $context = null) {
-  // We want the logged-in, or the mass mailing creator contact's signatures.
-  if (!($contact_id = CRM_Core_Session::singleton()->getLoggedInContactID()) && !empty($job) && !empty($context)) {
-    if ($job_object = call_user_func_array(array($context, 'findById'), array($job))) {
-      if ($mailing = CRM_Mailing_BAO_Mailing::findById($job_object->mailing_id)) {
-        $contact_id = $mailing->created_id;
+  if (array_key_exists('signatures', $tokens)) {
+    // Retrieve the mass mailing creator, or the logged-in contact's ID.
+    if (!empty($job) && !empty($context)) {
+      try {
+        $mailing_job_result = civicrm_api3('MailingJob', 'getsingle', array(
+          'id' => $job,
+          'return' => array("mailing_id"),
+        ));
+        if (empty($mailing_job_result['mailing_id'])) {
+          throw new Exception('Error retrieving MailingJob with ID ' . $job . '. Error returned: ' . $mailing_job_result['error_message']);
+        }
+
+        $mailing_result = civicrm_api3('Mailing', 'getsingle', array(
+          'id' => $mailing_job_result['mailing_id'],
+          'return' => array("created_id"),
+        ));
+        if (empty($mailing_result['created_id'])) {
+          throw new Exception('Error retrieving Mailing with ID ' . $mailing_result['mailing_id'] . '. Error returned: ' . $mailing_job_result['error_message']);
+        }
+
+        $contact_id = $mailing_result['created_id'];
+
+      }
+      catch (Exception $exception) {
+        CRM_Core_Error::debug_log_message('de.systopia.signatures:tokenValues():Could not retrieve contact ID from MailingJob. Trying logged-in contact. Exception caught: ' . $exception->getMessage());
       }
     }
-  }
 
-  if ($signatures = CRM_Signatures_Signatures::getSignatures($contact_id)) {
-    foreach ($cids as $cid) {
-      foreach ($signatures->getData() as $signature_name => $signature_body) {
-        $values[$cid]['signatures.' . $signature_name] = $signature_body;
+    if (empty($contact_id) && !$contact_id = CRM_Core_Session::singleton()->getLoggedInContactID()) {
+      CRM_Core_Error::debug_log_message('de.systopia.signatures:tokenValues():Could not retrieve contact ID for signature.');
+    }
+
+    // Fetch signatures and fill token values.
+    if ($signatures = CRM_Signatures_Signatures::getSignatures($contact_id)) {
+      foreach ($cids as $cid) {
+        foreach ($signatures->getData() as $signature_name => $signature_body) {
+          $values[$cid]['signatures.' . $signature_name] = $signature_body;
+        }
       }
     }
   }
