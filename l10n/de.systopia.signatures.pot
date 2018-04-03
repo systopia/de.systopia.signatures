@@ -1,0 +1,24 @@
+#: ./CRM/Signatures/Signatures.php
+msgid "Letter signature (HTML)"
+msgstr ""
+
+#: ./CRM/Signatures/Signatures.php
+msgid "E-mail signature (HTML)"
+msgstr ""
+
+#: ./CRM/Signatures/Signatures.php
+msgid "E-mail signature (plain text)"
+msgstr ""
+
+#: ./CRM/Signatures/Signatures.php
+msgid "Mass mailing signature (HTML)"
+msgstr ""
+
+#: ./CRM/Signatures/Signatures.php
+msgid "Mass mailing signature (plain text)"
+msgstr ""
+
+#: ./templates/CRM/Signatures/Form/Signatures.tpl
+msgid "You are editing signatures for the contact with the ID <em>%1</em>"
+msgstr ""
+
