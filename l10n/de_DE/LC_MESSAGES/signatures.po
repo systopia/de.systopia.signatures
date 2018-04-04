@@ -12,6 +12,10 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "Language: de_DE\n"
 
+#: ./signatures.php
+msgid "Signatures"
+msgstr "Signaturen"
+
 #: CRM/Signatures/Signatures.php
 msgid "Letter signature (HTML)"
 msgstr "Briefsignatur (HTML-formatiert)"

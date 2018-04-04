@@ -1,5 +1,5 @@
 <div class="description">
-  {ts 1=$contactID}You are editing signatures for the contact with the ID <em>%1</em>{/ts}
+  {$header}
 </div>
 
 <div class="crm-submit-buttons">

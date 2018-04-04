@@ -150,11 +150,11 @@ class CRM_Signatures_Signatures {
    */
   public static function allowedSignatures() {
     return array(
-      'signature_letter_html' => ts('Letter signature (HTML)', array('domain' => 'de.systopia.signatures')),
-      'signature_email_html' => ts('E-mail signature (HTML)', array('domain' => 'de.systopia.signatures')),
-      'signature_email_plain' => ts('E-mail signature (plain text)', array('domain' => 'de.systopia.signatures')),
-      'signature_mass_mailing_html' => ts('Mass mailing signature (HTML)', array('domain' => 'de.systopia.signatures')),
-      'signature_mass_mailing_plain' => ts('Mass mailing signature (plain text)', array('domain' => 'de.systopia.signatures')),
+      'signature_letter_html' => E::ts('Letter signature (HTML)', array('domain' => 'de.systopia.signatures')),
+      'signature_email_html' => E::ts('E-mail signature (HTML)', array('domain' => 'de.systopia.signatures')),
+      'signature_email_plain' => E::ts('E-mail signature (plain text)', array('domain' => 'de.systopia.signatures')),
+      'signature_mass_mailing_html' => E::ts('Mass mailing signature (HTML)', array('domain' => 'de.systopia.signatures')),
+      'signature_mass_mailing_plain' => E::ts('Mass mailing signature (plain text)', array('domain' => 'de.systopia.signatures')),
     );
   }
 

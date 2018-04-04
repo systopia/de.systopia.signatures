@@ -1,3 +1,7 @@
+#: ./signatures.php
+msgid "Signatures"
+msgstr ""
+
 #: ./CRM/Signatures/Signatures.php
 msgid "Letter signature (HTML)"
 msgstr ""

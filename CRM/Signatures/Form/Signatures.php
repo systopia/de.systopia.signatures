@@ -53,7 +53,7 @@ class CRM_Signatures_Form_Signatures extends CRM_Core_Form {
     $this->add(
       'textarea',
       'signature_email_plain',
-      E::ts('E-mail signature (Plain text)', array('domain' => 'de.systopia.signatures'))
+      E::ts('E-mail signature (plain text)', array('domain' => 'de.systopia.signatures'))
     );
     $this->add(
       'wysiwyg',
@@ -63,7 +63,7 @@ class CRM_Signatures_Form_Signatures extends CRM_Core_Form {
     $this->add(
       'textarea',
       'signature_mass_mailing_plain',
-      E::ts('Mass mailing signature (Plain text)', array('domain' => 'de.systopia.signatures'))
+      E::ts('Mass mailing signature (plain text)', array('domain' => 'de.systopia.signatures'))
     );
 
     $this->addButtons(array(
@@ -77,6 +77,10 @@ class CRM_Signatures_Form_Signatures extends CRM_Core_Form {
     // Export form elements.
     $this->assign('elementNames', $this->getRenderableElementNames());
     $this->assign('contactID', $contact_id);
+    $this->assign('header', E::ts('You are editing signatures for the contact with the ID <em>%1</em>', array(
+      'domain' => 'de.systopia.signatures',
+      1 => $contact_id,
+    )));
 
     parent::buildQuickForm();
   }
