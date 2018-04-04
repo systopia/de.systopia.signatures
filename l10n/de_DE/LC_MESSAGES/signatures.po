@@ -1,0 +1,37 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: \n"
+"POT-Creation-Date: \n"
+"PO-Revision-Date: \n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Poedit 1.8.7.1\n"
+"Last-Translator: \n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"Language: de_DE\n"
+
+#: CRM/Signatures/Signatures.php
+msgid "Letter signature (HTML)"
+msgstr "Briefsignatur (HTML-formatiert)"
+
+#: CRM/Signatures/Signatures.php
+msgid "E-mail signature (HTML)"
+msgstr "E-Mail-Signatur (HTML-formatiert)"
+
+#: CRM/Signatures/Signatures.php
+msgid "E-mail signature (plain text)"
+msgstr "E-Mail-Signatur (nur Text)"
+
+#: CRM/Signatures/Signatures.php
+msgid "Mass mailing signature (HTML)"
+msgstr "Signatur für Massenmail (HTML-formatiert)"
+
+#: CRM/Signatures/Signatures.php
+msgid "Mass mailing signature (plain text)"
+msgstr "Signatur für Massenmail (nur Text)"
+
+#: templates/CRM/Signatures/Form/Signatures.tpl
+msgid "You are editing signatures for the contact with the ID <em>%1</em>"
+msgstr "Sie bearbeiten derzeit die Signaturen für den Kontakt mit der ID <em>%1</em>"
