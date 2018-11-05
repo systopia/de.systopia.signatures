@@ -34,7 +34,7 @@ class CRM_Signatures_Upgrader extends CRM_Signatures_Upgrader_Base {
     );
     foreach ($all_signatures as $contact_id => $signatures) {
       CRM_Core_BAO_Setting::setItem(
-        $signatures,
+        (object) $signatures,
         'de.systopia.signatures',
         'signatures_signatures',
         NULL,
