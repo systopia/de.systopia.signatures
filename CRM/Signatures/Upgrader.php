@@ -33,13 +33,28 @@ class CRM_Signatures_Upgrader extends CRM_Signatures_Upgrader_Base {
       'signatures_signatures'
     );
     foreach ($all_signatures as $contact_id => $signatures) {
-      CRM_Core_BAO_Setting::setItem(
-        (object) $signatures,
-        'de.systopia.signatures',
-        'signatures_signatures',
-        NULL,
-        $contact_id
-      );
+      try {
+        $signatures_object = new CRM_Signatures_Signatures($contact_id, $signatures);
+        $signatures_object->verifySignatures();
+        CRM_Core_BAO_Setting::setItem(
+          (object) $signatures,
+          'de.systopia.signatures',
+          'signatures_signatures',
+          NULL,
+          $contact_id
+        );
+      }
+      catch (Exception $exception) {
+        CRM_Core_Session::setStatus(
+          E::ts(
+            'Could not process signatures for contact with ID %1. You may have to re-create them manually.',
+            array(1 => $contact_id)
+          ),
+          E::ts('Signatures database upgrade'),
+          'error'
+        );
+        continue;
+      }
     }
 
     // Remove the old settings entry (Set it to NULL).

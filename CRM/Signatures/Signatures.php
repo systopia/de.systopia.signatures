@@ -105,12 +105,18 @@ class CRM_Signatures_Signatures {
    * @param string $signature_name
    * @param mixed $signature_body
    *
-   * @throws \Exception
+   * @throws \CRM_Signatures_Exception
    *   When the signature name is not known.
    */
   public function setSignature($signature_name, $signature_body) {
     if (!in_array($signature_name, array_keys(self::allowedSignatures()))) {
-      throw new Exception("Unknown signature name {$signature_name}.");
+      throw new CRM_Signatures_Exception(
+        E::ts('Unknown signature name %1', array(1 => $signature_name)),
+        'signatures_unknown_signature',
+        array(
+          'signature_name' => $signature_name,
+        )
+      );
     }
     // TODO: Check if value is acceptable.
     $this->data[$signature_name] = $signature_body;
@@ -119,15 +125,26 @@ class CRM_Signatures_Signatures {
   /**
    * Verifies whether the signatures are valid.
    *
-   * @throws Exception
+   * @throws \CRM_Signatures_Exception
    *   When the signatures could not be successfully validated.
    */
   public function verifySignatures() {
-    // TODO: Anything to verify?
+    // Serialize and check for allowed database column length. The MySQL data
+    // type for settings data is TEXT, which allows 2^16 bytes for the actual
+    // value.
+    $blob = serialize((object)$this->getData());
+    if (strlen($blob) > pow(2, 16)) {
+      throw new CRM_Signatures_Exception(
+        E::ts('Signatures data is too long.'),
+        'signatures_too_long'
+      );
+    }
   }
 
   /**
    * Persists the signatures within the CiviCRM settings.
+   *
+   * @throws \CRM_Signatures_Exception
    */
   public function saveSignatures() {
     self::$_signatures[$this->getContactID()] = $this;
