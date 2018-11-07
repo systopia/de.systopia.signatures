@@ -27,33 +27,55 @@ class CRM_Signatures_Upgrader extends CRM_Signatures_Upgrader_Base {
    * @return bool
    *   Whether the upgrade task executed successfully.
    */
-  public function upgrade_4200() {
-    $all_signatures = CRM_Core_BAO_Setting::getItem(
-      'de.systopia.signatures',
-      'signatures_signatures'
+  public function upgrade_4000() {
+    // Signatures data may be corrupted due to serialization errors when
+    // containing special characters. We try to recover them.
+    // Using CRM_Core_BAO_Setting::getItem() is thus not sufficient, as it just
+    // tries to unserialize() the data.
+
+    // Retrieve the serialization string from the database directly.
+    $value = CRM_Core_DAO::singleValueQuery(
+      'SELECT `value` from `civicrm_setting` WHERE `name` = "signatures_signatures";'
     );
-    foreach ($all_signatures as $contact_id => $signatures) {
-      try {
-        $signatures_object = new CRM_Signatures_Signatures($contact_id, $signatures);
-        $signatures_object->verifySignatures();
-        CRM_Core_BAO_Setting::setItem(
-          (object) $signatures,
-          'de.systopia.signatures',
-          'signatures_signatures',
-          NULL,
-          $contact_id
-        );
-      }
-      catch (Exception $exception) {
-        CRM_Core_Session::setStatus(
-          E::ts(
-            'Could not process signatures for contact with ID %1. You may have to re-create them manually.',
-            array(1 => $contact_id)
-          ),
-          E::ts('Signatures database upgrade'),
-          'error'
-        );
-        continue;
+
+    // Try to unserialize original string.
+    $all_signatures = unserialize($value);
+
+    // In case of failure try to repair it.
+    if($all_signatures === FALSE){
+      $repairedSerialization = static::fix_serialized($value);
+      $all_signatures = unserialize($repairedSerialization);
+    }
+
+    if (!empty($all_signatures)) {
+      $all_signatures = (array) $all_signatures;
+      foreach ($all_signatures as $contact_id => $signatures) {
+        try {
+          $signatures_object = new CRM_Signatures_Signatures($contact_id, $signatures);
+          $signatures_object->verifySignatures();
+          $signatures_data = array();
+          foreach ($signatures_object->getData() as $signature_name => $signature) {
+            $signatures_data[$signature_name] = base64_encode($signature);
+          }
+          CRM_Core_BAO_Setting::setItem(
+            (object) $signatures_data,
+            'de.systopia.signatures',
+            'signatures_signatures',
+            NULL,
+            $contact_id
+          );
+        }
+        catch (Exception $exception) {
+          CRM_Core_Session::setStatus(
+            E::ts(
+              'Could not process signatures for contact with ID %1. You may have to re-create them manually.',
+              array(1 => $contact_id)
+            ),
+            E::ts('Signatures database upgrade'),
+            'error'
+          );
+          continue;
+        }
       }
     }
 
@@ -65,6 +87,52 @@ class CRM_Signatures_Upgrader extends CRM_Signatures_Upgrader_Base {
     );
 
     return TRUE;
+  }
+
+  /**
+   * Utility function for fixing wrong byte lengths in serialization strings.
+   *
+   * @see https://stackoverflow.com/a/34224433.
+   *
+   * @param $matches
+   *
+   * @return string
+   */
+  public static function fix_str_length($matches) {
+    $string = $matches[2];
+    $right_length = strlen($string); // yes, strlen even for UTF-8 characters, PHP wants the mem size, not the char count
+    return 's:' . $right_length . ':"' . $string . '";';
+  }
+
+  /**
+   * Utility function for repairing corrupted serialization strings.
+   *
+   * @see https://stackoverflow.com/a/34224433.
+   *
+   * @param $string
+   *
+   * @return null|string|string[]
+   */
+  public static function fix_serialized($string) {
+    // securities
+    if (!preg_match('/^[aOs]:/', $string)) {
+      return $string;
+    }
+    if (@unserialize($string) !== FALSE) {
+      return $string;
+    }
+    $string = preg_replace("%\n%", "", $string);
+    // doublequote exploding
+    $data = preg_replace('%";%', "µµµ", $string);
+    $tab = explode("µµµ", $data);
+    $new_data = '';
+    foreach ($tab as $line) {
+      $new_data .= preg_replace_callback('%\bs:(\d+):"(.*)%', array(
+        static::class,
+        'fix_str_length',
+      ), $line);
+    }
+    return $new_data;
   }
 
 }

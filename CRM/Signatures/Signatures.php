@@ -149,8 +149,12 @@ class CRM_Signatures_Signatures {
   public function saveSignatures() {
     self::$_signatures[$this->getContactID()] = $this;
     $this->verifySignatures();
+    $signatures_data = array();
+    foreach ($this->getData() as $signature_name => $signature) {
+      $signatures_data[$signature_name] = base64_encode($signature);
+    }
     CRM_Core_BAO_Setting::setItem(
-      (object) $this->getData(),
+      (object) $signatures_data,
       'de.systopia.signatures',
       'signatures_signatures',
       NULL,
@@ -198,13 +202,18 @@ class CRM_Signatures_Signatures {
    */
   public static function getSignatures($contact_id) {
     if (!isset(self::$_signatures[$contact_id])) {
-      self::$_signatures[$contact_id] = new self($contact_id, (array) CRM_Core_BAO_Setting::getItem(
+      $signatures_raw = (array) CRM_Core_BAO_Setting::getItem(
         'de.systopia.signatures',
         'signatures_signatures',
         NULL,
         NULL,
         $contact_id
-      ));
+      );
+      $signatures_data = array();
+      foreach ($signatures_raw as $signature_name => $signature_raw) {
+        $signatures_data[$signature_name] = base64_decode($signature_raw);
+      }
+      self::$_signatures[$contact_id] = new self($contact_id, $signatures_data);
     }
 
     return self::$_signatures[$contact_id];
