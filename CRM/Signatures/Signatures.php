@@ -105,12 +105,18 @@ class CRM_Signatures_Signatures {
    * @param string $signature_name
    * @param mixed $signature_body
    *
-   * @throws \Exception
+   * @throws \CRM_Signatures_Exception
    *   When the signature name is not known.
    */
   public function setSignature($signature_name, $signature_body) {
     if (!in_array($signature_name, array_keys(self::allowedSignatures()))) {
-      throw new Exception("Unknown signature name {$signature_name}.");
+      throw new CRM_Signatures_Exception(
+        E::ts('Unknown signature name %1', array(1 => $signature_name)),
+        'signatures_unknown_signature',
+        array(
+          'signature_name' => $signature_name,
+        )
+      );
     }
     // TODO: Check if value is acceptable.
     $this->data[$signature_name] = $signature_body;
@@ -119,28 +125,57 @@ class CRM_Signatures_Signatures {
   /**
    * Verifies whether the signatures are valid.
    *
-   * @throws Exception
+   * @throws \CRM_Signatures_Exception
    *   When the signatures could not be successfully validated.
    */
   public function verifySignatures() {
-    // TODO: Anything to verify?
+    // Serialize and check for allowed database column length. The MySQL data
+    // type for settings data is TEXT, which allows 2^16 bytes for the actual
+    // value.
+    $blob = serialize((object)$this->getData());
+    if (strlen($blob) > pow(2, 16)) {
+      throw new CRM_Signatures_Exception(
+        E::ts('Signatures data is too long.'),
+        'signatures_too_long'
+      );
+    }
   }
 
   /**
    * Persists the signatures within the CiviCRM settings.
+   *
+   * @throws \CRM_Signatures_Exception
    */
   public function saveSignatures() {
     self::$_signatures[$this->getContactID()] = $this;
     $this->verifySignatures();
-    self::storeSignatures();
+    $signatures_data = array();
+    foreach ($this->getData() as $signature_name => $signature) {
+      $signatures_data[$signature_name] = base64_encode($signature);
+    }
+    CRM_Core_BAO_Setting::setItem(
+      (object) $signatures_data,
+      'de.systopia.signatures',
+      'signatures_signatures',
+      NULL,
+      $this->getContactID()
+    );
   }
 
   /**
    * Deletes the signatures from the CiviCRM settings.
    */
   public function deleteSignatures() {
-    unset(self::$_signatures[$this->getContactID()]);
-    self::storeSignatures();
+    if (isset(self::$_signatures[$this->getContactID()])) {
+      unset(self::$_signatures[$this->getContactID()]);
+      CRM_Core_BAO_Setting::setItem(
+        NULL,
+        'de.systopia.signatures',
+        'signatures_signatures',
+        NULL,
+        $this->getContactID()
+      );
+    }
   }
 
   /**
@@ -166,43 +201,22 @@ class CRM_Signatures_Signatures {
    * @return CRM_Signatures_Signatures | NULL
    */
   public static function getSignatures($contact_id) {
-    $signatures = self::getAllSignatures();
-    if (isset($signatures[$contact_id])) {
-      return $signatures[$contact_id];
-    }
-    else {
-      return NULL;
-    }
-  }
-
-  /**
-   * Retrieves the list of all sets of signatures persisted within the current
-   * CiviCRM settings.
-   *
-   * @return CRM_Signatures_Signatures[]
-   */
-  public static function getAllSignatures() {
-    if (self::$_signatures === NULL) {
-      self::$_signatures = array();
-      if ($all_signatures_data = CRM_Core_BAO_Setting::getItem('de.systopia.signatures', 'signatures_signatures')) {
-        foreach ($all_signatures_data as $contact_id => $signatures_data) {
-          self::$_signatures[$contact_id] = new CRM_Signatures_Signatures($contact_id, $signatures_data);
-        }
+    if (!isset(self::$_signatures[$contact_id])) {
+      $signatures_raw = (array) CRM_Core_BAO_Setting::getItem(
+        'de.systopia.signatures',
+        'signatures_signatures',
+        NULL,
+        NULL,
+        $contact_id
+      );
+      $signatures_data = array();
+      foreach ($signatures_raw as $signature_name => $signature_raw) {
+        $signatures_data[$signature_name] = base64_decode($signature_raw);
       }
+      self::$_signatures[$contact_id] = new self($contact_id, $signatures_data);
     }
 
-    return self::$_signatures;
+    return self::$_signatures[$contact_id];
   }
 
-  /**
-   * Persists the list of all loaded sets of signatures into the CiviCRM
-   * settings.
-   */
-  public static function storeSignatures() {
-    $signatures_data = array();
-    foreach (self::$_signatures as $contact_id => $signatures) {
-      $signatures_data[$contact_id] = $signatures->data;
-    }
-    CRM_Core_BAO_Setting::setItem((object) $signatures_data, 'de.systopia.signatures', 'signatures_signatures');
-  }
 }

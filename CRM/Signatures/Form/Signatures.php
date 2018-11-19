@@ -99,6 +99,44 @@ class CRM_Signatures_Form_Signatures extends CRM_Core_Form {
   }
 
   /**
+   * Validate the submitted form.
+   *
+   * @return bool
+   */
+  public function validate() {
+    $values = $this->exportValues();
+    $contact_id = $this->getContactID();
+
+    try {
+      $this->signatures->setContactID($contact_id);
+      foreach ($this->signatures->getData() as $signature_name => $signature_body) {
+        if (isset($values[$signature_name])) {
+          $this->signatures->setSignature($signature_name, $values[$signature_name]);
+        }
+      }
+      $this->signatures->verifySignatures();
+    }
+    catch (Exception $exception) {
+      switch ($exception->getCode()) {
+        case 'signatures_too_long':
+          $this->setElementError(
+            'buttons',
+            E::ts('The signatures are too long. Please shorten at least one signature.')
+          );
+          break;
+        default:
+          $this->setElementError(
+            'buttons',
+            E::ts('An error occurred, please reload the form.')
+          );
+          break;
+      }
+    }
+
+    return parent::validate();
+  }
+
+  /**
    * Processes the submitted form.
    */
   public function postProcess() {
