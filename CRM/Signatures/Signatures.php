@@ -154,7 +154,7 @@ class CRM_Signatures_Signatures {
       $signatures_data[$signature_name] = base64_encode($signature);
     }
     CRM_Core_BAO_Setting::setItem(
-      (object) $signatures_data,
+      $signatures_data,
       'de.systopia.signatures',
       'signatures_signatures',
       NULL,
@@ -202,7 +202,7 @@ class CRM_Signatures_Signatures {
    */
   public static function getSignatures($contact_id) {
     if (!isset(self::$_signatures[$contact_id])) {
-      $signatures_raw = (array) CRM_Core_BAO_Setting::getItem(
+      $signatures_raw = CRM_Core_BAO_Setting::getItem(
         'de.systopia.signatures',
         'signatures_signatures',
         NULL,

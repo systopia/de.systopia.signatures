@@ -58,7 +58,7 @@ class CRM_Signatures_Upgrader extends CRM_Signatures_Upgrader_Base {
             $signatures_data[$signature_name] = base64_encode($signature);
           }
           CRM_Core_BAO_Setting::setItem(
-            (object) $signatures_data,
+            $signatures_data,
             'de.systopia.signatures',
             'signatures_signatures',
             NULL,
@@ -85,6 +85,26 @@ class CRM_Signatures_Upgrader extends CRM_Signatures_Upgrader_Base {
       'de.systopia.signatures',
       'signatures_signatures'
     );
+
+    return TRUE;
+  }
+
+  /**
+   * Convert serialized settings from objects to arrays.
+   *
+   * @link https://civicrm.org/advisory/civi-sa-2019-21-poi-saved-search-and-report-instance-apis
+   */
+  public function upgrade_5011() {
+    // Do not use CRM_Core_BAO::getItem() or Civi::settings()->get().
+    // Extract and unserialize directly from the database.
+    $signatures_query = CRM_Core_DAO::executeQuery("
+        SELECT `value`
+          FROM `civicrm_setting`
+        WHERE `name` = 'signatures_signatures';");
+    if ($signatures_query->fetch()) {
+      $profiles = unserialize($signatures_query->value);
+      Civi::settings()->set('signatures_signatures', (array) $profiles);
+    }
 
     return TRUE;
   }
