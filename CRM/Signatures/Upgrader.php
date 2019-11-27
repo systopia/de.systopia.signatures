@@ -98,12 +98,18 @@ class CRM_Signatures_Upgrader extends CRM_Signatures_Upgrader_Base {
     // Do not use CRM_Core_BAO::getItem() or Civi::settings()->get().
     // Extract and unserialize directly from the database.
     $signatures_query = CRM_Core_DAO::executeQuery("
-        SELECT `value`
+        SELECT `value`, `contact_id`
           FROM `civicrm_setting`
         WHERE `name` = 'signatures_signatures';");
-    if ($signatures_query->fetch()) {
-      $profiles = unserialize($signatures_query->value);
-      Civi::settings()->set('signatures_signatures', (array) $profiles);
+    while ($signatures_query->fetch()) {
+      $signatures_record = unserialize($signatures_query->value);
+      CRM_Core_BAO_Setting::setItem(
+        (array) $signatures_record,
+        'de.systopia.signatures',
+        'signatures_signatures',
+        NULL,
+        $signatures_query->contact_id
+      );
     }
 
     return TRUE;
