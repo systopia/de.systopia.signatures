@@ -57,13 +57,8 @@ class CRM_Signatures_Upgrader extends CRM_Signatures_Upgrader_Base {
           foreach ($signatures_object->getData() as $signature_name => $signature) {
             $signatures_data[$signature_name] = base64_encode($signature);
           }
-          CRM_Core_BAO_Setting::setItem(
-            $signatures_data,
-            'de.systopia.signatures',
-            'signatures_signatures',
-            NULL,
-            $contact_id
-          );
+          Civi::contactSettings($contact_id)
+            ->set('signatures_signatures', $signatures_data);
         }
         catch (Exception $exception) {
           CRM_Core_Session::setStatus(
@@ -80,11 +75,8 @@ class CRM_Signatures_Upgrader extends CRM_Signatures_Upgrader_Base {
     }
 
     // Remove the old settings entry (Set it to NULL).
-    CRM_Core_BAO_Setting::setItem(
-      NULL,
-      'de.systopia.signatures',
-      'signatures_signatures'
-    );
+    Civi::settings()
+      ->revert('signatures_signatures');
 
     return TRUE;
   }
@@ -103,13 +95,8 @@ class CRM_Signatures_Upgrader extends CRM_Signatures_Upgrader_Base {
         WHERE `name` = 'signatures_signatures';");
     while ($signatures_query->fetch()) {
       $signatures_record = unserialize($signatures_query->value);
-      CRM_Core_BAO_Setting::setItem(
-        (array) $signatures_record,
-        'de.systopia.signatures',
-        'signatures_signatures',
-        NULL,
-        $signatures_query->contact_id
-      );
+      Civi::contactSettings($signatures_query->contact_id)
+        ->set('signatures_signatures', (array) $signatures_record);
     }
 
     return TRUE;
