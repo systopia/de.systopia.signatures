@@ -153,13 +153,9 @@ class CRM_Signatures_Signatures {
     foreach ($this->getData() as $signature_name => $signature) {
       $signatures_data[$signature_name] = base64_encode($signature);
     }
-    CRM_Core_BAO_Setting::setItem(
-      (object) $signatures_data,
-      'de.systopia.signatures',
-      'signatures_signatures',
-      NULL,
-      $this->getContactID()
-    );
+
+    Civi::contactSettings($this->getContactID())
+      ->set('signatures_signatures', $signatures_data);
   }
 
   /**
@@ -168,13 +164,8 @@ class CRM_Signatures_Signatures {
   public function deleteSignatures() {
     if (isset(self::$_signatures[$this->getContactID()])) {
       unset(self::$_signatures[$this->getContactID()]);
-      CRM_Core_BAO_Setting::setItem(
-        NULL,
-        'de.systopia.signatures',
-        'signatures_signatures',
-        NULL,
-        $this->getContactID()
-      );
+      Civi::contactSettings($this->getContactID())
+        ->set('signatures_signatures', NULL);
     }
   }
 
@@ -202,13 +193,8 @@ class CRM_Signatures_Signatures {
    */
   public static function getSignatures($contact_id) {
     if (!isset(self::$_signatures[$contact_id])) {
-      $signatures_raw = (array) CRM_Core_BAO_Setting::getItem(
-        'de.systopia.signatures',
-        'signatures_signatures',
-        NULL,
-        NULL,
-        $contact_id
-      );
+      $signatures_raw = Civi::contactSettings($contact_id)
+        ->get('signatures_signatures');
       $signatures_data = array();
       foreach ($signatures_raw as $signature_name => $signature_raw) {
         $signatures_data[$signature_name] = base64_decode($signature_raw);

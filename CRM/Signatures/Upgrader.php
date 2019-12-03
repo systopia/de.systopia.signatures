@@ -57,13 +57,8 @@ class CRM_Signatures_Upgrader extends CRM_Signatures_Upgrader_Base {
           foreach ($signatures_object->getData() as $signature_name => $signature) {
             $signatures_data[$signature_name] = base64_encode($signature);
           }
-          CRM_Core_BAO_Setting::setItem(
-            (object) $signatures_data,
-            'de.systopia.signatures',
-            'signatures_signatures',
-            NULL,
-            $contact_id
-          );
+          Civi::contactSettings($contact_id)
+            ->set('signatures_signatures', $signatures_data);
         }
         catch (Exception $exception) {
           CRM_Core_Session::setStatus(
@@ -80,11 +75,29 @@ class CRM_Signatures_Upgrader extends CRM_Signatures_Upgrader_Base {
     }
 
     // Remove the old settings entry (Set it to NULL).
-    CRM_Core_BAO_Setting::setItem(
-      NULL,
-      'de.systopia.signatures',
-      'signatures_signatures'
-    );
+    Civi::settings()
+      ->revert('signatures_signatures');
+
+    return TRUE;
+  }
+
+  /**
+   * Convert serialized settings from objects to arrays.
+   *
+   * @link https://civicrm.org/advisory/civi-sa-2019-21-poi-saved-search-and-report-instance-apis
+   */
+  public function upgrade_5011() {
+    // Do not use CRM_Core_BAO::getItem() or Civi::settings()->get().
+    // Extract and unserialize directly from the database.
+    $signatures_query = CRM_Core_DAO::executeQuery("
+        SELECT `value`, `contact_id`
+          FROM `civicrm_setting`
+        WHERE `name` = 'signatures_signatures';");
+    while ($signatures_query->fetch()) {
+      $signatures_record = unserialize($signatures_query->value);
+      Civi::contactSettings($signatures_query->contact_id)
+        ->set('signatures_signatures', (array) $signatures_record);
+    }
 
     return TRUE;
   }
