@@ -193,11 +193,18 @@ class CRM_Signatures_Signatures {
    */
   public static function getSignatures($contact_id) {
     if (!isset(self::$_signatures[$contact_id])) {
-      $signatures_raw = Civi::contactSettings($contact_id)
-        ->get('signatures_signatures');
       $signatures_data = array();
-      foreach ($signatures_raw as $signature_name => $signature_raw) {
-        $signatures_data[$signature_name] = base64_decode($signature_raw);
+      try {
+        $signatures_raw = Civi::contactSettings($contact_id)
+          ->get('signatures_signatures');
+        if (!empty($signature_raw)) {
+          foreach ($signatures_raw as $signature_name => $signature_raw) {
+            $signatures_data[$signature_name] = base64_decode($signature_raw);
+          }
+        }
+      }
+      catch (Exception $exception) {
+        // There is no contact with that ID.
       }
       self::$_signatures[$contact_id] = new self($contact_id, $signatures_data);
     }
