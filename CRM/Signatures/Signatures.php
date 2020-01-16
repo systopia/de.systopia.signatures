@@ -197,7 +197,7 @@ class CRM_Signatures_Signatures {
       try {
         $signatures_raw = Civi::contactSettings($contact_id)
           ->get('signatures_signatures');
-        if (!empty($signature_raw)) {
+        if (!empty($signatures_raw)) {
           foreach ($signatures_raw as $signature_name => $signature_raw) {
             $signatures_data[$signature_name] = base64_decode($signature_raw);
           }
@@ -205,6 +205,7 @@ class CRM_Signatures_Signatures {
       }
       catch (Exception $exception) {
         // There is no contact with that ID.
+        Civi::log()->debug("Signature Extension: Contact ID '{$contact_id}' caused exception: " . $exception->getMessage());
       }
       self::$_signatures[$contact_id] = new self($contact_id, $signatures_data);
     }
