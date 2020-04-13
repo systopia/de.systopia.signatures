@@ -1,6 +1,7 @@
 site_name: Signatures
 repo_url: https://github.com/systopia/de.systopia.signatures
-theme: material
+theme: 
+  name: material
 
 nav:
 - 'Home': index.md
