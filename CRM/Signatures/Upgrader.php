@@ -57,7 +57,7 @@ class CRM_Signatures_Upgrader extends CRM_Signatures_Upgrader_Base {
           foreach ($signatures_object->getData() as $signature_name => $signature) {
             $signatures_data[$signature_name] = base64_encode($signature);
           }
-          Civi::contactSettings($contact_id)
+          CRM_Signatures_Utils::contactSettings($contact_id)
             ->set('signatures_signatures', $signatures_data);
         }
         catch (Exception $exception) {
@@ -95,7 +95,7 @@ class CRM_Signatures_Upgrader extends CRM_Signatures_Upgrader_Base {
         WHERE `name` = 'signatures_signatures';");
     while ($signatures_query->fetch()) {
       $signatures_record = unserialize($signatures_query->value);
-      Civi::contactSettings($signatures_query->contact_id)
+      CRM_Signatures_Utils::contactSettings($signatures_query->contact_id)
         ->set('signatures_signatures', (array) $signatures_record);
     }
 

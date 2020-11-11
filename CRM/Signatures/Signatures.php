@@ -154,7 +154,7 @@ class CRM_Signatures_Signatures {
       $signatures_data[$signature_name] = base64_encode($signature);
     }
 
-    Civi::contactSettings($this->getContactID())
+    CRM_Signatures_Utils::contactSettings($this->getContactID())
       ->set('signatures_signatures', $signatures_data);
   }
 
@@ -164,7 +164,7 @@ class CRM_Signatures_Signatures {
   public function deleteSignatures() {
     if (isset(self::$_signatures[$this->getContactID()])) {
       unset(self::$_signatures[$this->getContactID()]);
-      Civi::contactSettings($this->getContactID())
+      CRM_Signatures_Utils::contactSettings($this->getContactID())
         ->set('signatures_signatures', NULL);
     }
   }
@@ -195,7 +195,7 @@ class CRM_Signatures_Signatures {
     if (!isset(self::$_signatures[$contact_id])) {
       $signatures_data = array();
       try {
-        $signatures_raw = Civi::contactSettings($contact_id)
+        $signatures_raw = CRM_Signatures_Utils::contactSettings($contact_id)
           ->get('signatures_signatures');
         if (!empty($signatures_raw)) {
           foreach ($signatures_raw as $signature_name => $signature_raw) {
