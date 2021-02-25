@@ -30,8 +30,8 @@ The following tokens are available for usage in messages:
 
 | Token                            | Meaning                             |
 |----------------------------------|-------------------------------------|
-| `{signature_letter_html}`        | Letter signature (HTML)             |
-| `{signature_email_html}`         | E-mail signature (HTML)             |
-| `{signature_email_plain}`        | E-mail signature (plain text)       |
-| `{signature_mass_mailing_html}`  | Mass mailing signature (HTML)       |
-| `{signature_mass_mailing_plain}` | Mass mailing signature (plain text) |
+| `{signatures.signature_letter_html}`        | Letter signature (HTML)             |
+| `{signatures.signature_email_html}`         | E-mail signature (HTML)             |
+| `{signatures.signature_email_plain}`        | E-mail signature (plain text)       |
+| `{signatures.signature_mass_mailing_html}`  | Mass mailing signature (HTML)       |
+| `{signatures.signature_mass_mailing_plain}` | Mass mailing signature (plain text) |
