@@ -19,7 +19,7 @@ use CRM_Signatures_ExtensionUtil as E;
 /**
  * Collection of upgrade steps.
  */
-class CRM_Signatures_Upgrader extends CRM_Signatures_Upgrader_Base {
+class CRM_Signatures_Upgrader extends CRM_Extension_Upgrader_Base {
 
   /**
    * Split the signatures settings into contact-specific settings.
