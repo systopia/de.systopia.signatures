@@ -65,6 +65,16 @@ class CRM_Signatures_Form_Signatures extends CRM_Core_Form {
       'signature_mass_mailing_plain',
       E::ts('Mass mailing signature (plain text)', array('domain' => 'de.systopia.signatures'))
     );
+    $this->add(
+      'wysiwyg',
+      'signature_additional_html',
+      E::ts('Additional signature (HTML)', array('domain' => 'de.systopia.signatures'))
+    );
+    $this->add(
+      'textarea',
+      'signature_additional_plain',
+      E::ts('Additional signature (plain text)', array('domain' => 'de.systopia.signatures'))
+    );
 
     $this->addButtons(array(
       array(

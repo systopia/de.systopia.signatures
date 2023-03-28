@@ -181,6 +181,8 @@ class CRM_Signatures_Signatures {
       'signature_email_plain' => E::ts('E-mail signature (plain text)', array('domain' => 'de.systopia.signatures')),
       'signature_mass_mailing_html' => E::ts('Mass mailing signature (HTML)', array('domain' => 'de.systopia.signatures')),
       'signature_mass_mailing_plain' => E::ts('Mass mailing signature (plain text)', array('domain' => 'de.systopia.signatures')),
+      'signature_additional_html' => E::ts('Additional signature (HTML)', array('domain' => 'de.systopia.signatures')),
+      'signature_additional_plain' => E::ts('Additional signature (plain text)', array('domain' => 'de.systopia.signatures')),
     );
   }
 
