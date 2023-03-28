@@ -7,4 +7,4 @@ The *Signatures* extension allows multiple separate signatures to be attached to
 When sending messages, those tokens are being replaced with the particular signature of the logged-in contact, or the creator contacts, when using mass mailings (which can be sent automatically by a cron job), respectively.
 
 ## Documentation
-- https://docs.civicrm.org/signatures/en/latest
+- https://docs.civicrm.org/signatures/en/latest (automatic publishing)
