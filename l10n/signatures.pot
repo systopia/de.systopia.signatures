@@ -1,82 +1,64 @@
-msgid ""
-msgstr ""
-"Project-Id-Version: \n"
-"POT-Creation-Date: \n"
-"PO-Revision-Date: \n"
-"Last-Translator: \n"
-"Language-Team: \n"
-"Language: de_DE\n"
-"MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=UTF-8\n"
-"Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"X-Generator: Poedit 3.0.1\n"
-
 #: CRM/Signatures/Form/Signatures.php CRM/Signatures/Signatures.php
 msgid "Letter signature (HTML)"
-msgstr "Briefsignatur (HTML-formatiert)"
+msgstr ""
 
 #: CRM/Signatures/Form/Signatures.php CRM/Signatures/Signatures.php
 msgid "E-mail signature (HTML)"
-msgstr "E-Mail-Signatur (HTML-formatiert)"
+msgstr ""
 
 #: CRM/Signatures/Form/Signatures.php CRM/Signatures/Signatures.php
 msgid "E-mail signature (plain text)"
-msgstr "E-Mail-Signatur (nur Text)"
+msgstr ""
 
 #: CRM/Signatures/Form/Signatures.php CRM/Signatures/Signatures.php
 msgid "Mass mailing signature (HTML)"
-msgstr "Signatur für Massenmail (HTML-formatiert)"
+msgstr ""
 
 #: CRM/Signatures/Form/Signatures.php CRM/Signatures/Signatures.php
 msgid "Mass mailing signature (plain text)"
-msgstr "Signatur für Massenmail (nur Text)"
+msgstr ""
 
 #: CRM/Signatures/Form/Signatures.php CRM/Signatures/Signatures.php
 msgid "Additional signature (HTML)"
-msgstr "Zusätzliche Signatur (HTML-formatiert)"
+msgstr ""
 
 #: CRM/Signatures/Form/Signatures.php CRM/Signatures/Signatures.php
 msgid "Additional signature (plain text)"
-msgstr "Zusätzliche Signatur (nur Text)"
+msgstr ""
 
 #: CRM/Signatures/Form/Signatures.php
 msgid "Submit"
-msgstr "Absenden"
+msgstr ""
 
 #: CRM/Signatures/Form/Signatures.php
 msgid "You are editing signatures for the contact with the ID <em>%1</em>"
 msgstr ""
-"Sie bearbeiten derzeit die Signaturen für den Kontakt mit der ID <em>%1</em>"
 
 #: CRM/Signatures/Form/Signatures.php
 msgid "The signatures are too long. Please shorten at least one signature."
-msgstr "Die Signaturen sind zu lang. Bitte mindestens eine Signatur kürzen."
+msgstr ""
 
 #: CRM/Signatures/Form/Signatures.php
 msgid "An error occurred, please reload the form."
-msgstr "Ein Fehler ist aufgetreten, bitte das Formular erneut laden."
+msgstr ""
 
 #: CRM/Signatures/Signatures.php
 msgid "Unknown signature name %1"
-msgstr "Unbekannter Signaturname %1"
+msgstr ""
 
 #: CRM/Signatures/Signatures.php
 msgid "Signatures data is too long."
-msgstr "Signaturinhalt ist zu lang."
+msgstr ""
 
 #: CRM/Signatures/Upgrader.php
-msgid ""
-"Could not process signatures for contact with ID %1. You may have to re-"
-"create them manually."
+msgid "Could not process signatures for contact with ID %1. You may have to re-create them manually."
 msgstr ""
-"Signaturen für Kontakt mit ID %1 konnten nicht verarbeitet werden. Sie "
-"müssen möglicherweise manuell neu erstellt werden."
 
 #: CRM/Signatures/Upgrader.php
 msgid "Signatures database upgrade"
-msgstr "Datenbank-Aktualisierung für Signaturen"
+msgstr ""
 
 #: signatures.php
 msgid "Signatures"
-msgstr "Signaturen"
+msgstr ""
+
