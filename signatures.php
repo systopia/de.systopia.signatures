@@ -12,9 +12,8 @@ use CRM_Signatures_ExtensionUtil as E;
  * Implements hook_civicrm_config().
  *
  * @link http://wiki.civicrm.org/confluence/display/CRMDOC/hook_civicrm_config
- * @phpstan-ignore missingType.parameter
  */
-function signatures_civicrm_config(&$config): void {
+function signatures_civicrm_config(\CRM_Core_Config &$config): void {
   _signatures_civix_civicrm_config($config);
 }
 
@@ -36,23 +35,14 @@ function signatures_civicrm_enable(): void {
   _signatures_civix_civicrm_enable();
 }
 
-// --- Functions below this ship commented out. Uncomment as required. ---
-
-/**
- * Implements hook_civicrm_preProcess().
- *
- * @link http://wiki.civicrm.org/confluence/display/CRMDOC/hook_civicrm_preProcess
- *
- *
- * // */
-
 /**
  * Implements hook_civicrm_navigationMenu().
  *
- * @link http://wiki.civicrm.org/confluence/display/CRMDOC/hook_civicrm_navigationMenu
- * @phpstan-ignore missingType.parameter
+ * @phpstan-param array<string, array<string, mixed>> $menu
+ * @param-out array<string, array<string, mixed>> $menu
  */
-function signatures_civicrm_navigationMenu(&$menu): void {
+function signatures_civicrm_navigationMenu(array &$menu): void {
+  // @phpstan-ignore paramOut.type
   _signatures_civix_insert_navigation_menu($menu, 'Contacts', [
     'label' => E::ts('Signatures'),
     'name' => 'signatures',
@@ -67,10 +57,9 @@ function signatures_civicrm_navigationMenu(&$menu): void {
 /**
  * Implements hook_civicrm_tokens().
  *
- * @link http://wiki.civicrm.org/confluence/display/CRMDOC/hook_civicrm_tokens
- * @phpstan-ignore missingType.parameter
+ * @deprecated Deprecated - use the token Processor
  */
-function signatures_civicrm_tokens(&$tokens): void {
+function signatures_civicrm_tokens(array &$tokens): void {
   foreach (CRM_Signatures_Signatures::allowedSignatures() as $signature_type => $signature_label) {
     $tokens['signatures']['signatures.' . $signature_type] = $signature_label;
   }
@@ -79,12 +68,10 @@ function signatures_civicrm_tokens(&$tokens): void {
 /**
  * Implements hook_civicrm_tokenValues().
  *
- * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_tokenValues/
- * phpcs:disable Generic.Metrics.CyclomaticComplexity.TooHigh, Generic.Files.LineLength.TooLong
- * @phpstan-ignore missingType.parameter, missingType.parameter, missingType.parameter, missingType.parameter, missingType.parameter
+ * @deprecated This hook is deprecated - you should use the token processor methodology to offer custom tokens
  */
-function signatures_civicrm_tokenValues(&$values, $cids, $job = NULL, $tokens = [], $context = NULL): void {
-// phpcs:enable
+// phpcs:ignore Generic.Metrics.CyclomaticComplexity.TooHigh, Generic.Files.LineLength.TooLong
+function signatures_civicrm_tokenValues(array &$values, $cids, $job = NULL, array $tokens = [], $context = NULL): void {
   if (array_key_exists('signatures', $tokens)) {
     // Retrieve the mass mailing creator, or the logged-in contact's ID.
     if ((NULL !== $job && 0 !== $job) && (NULL !== $context && '' !== $context)) {
