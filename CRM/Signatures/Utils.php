@@ -14,26 +14,29 @@
 | written permission from the original author(s).             |
 +-------------------------------------------------------------*/
 
-use CRM_Signatures_ExtensionUtil as E;
+declare(strict_types = 1);
+
+use Civi\Core\SettingsBag;
 
 class CRM_Signatures_Utils {
 
   /**
    * Retrieves contact-specific CiviCRM settings.
    *
-   * @param $contact_id
+   * @param ?string $contact_id
    *
    * @return \Civi\Core\SettingsBag
    * @throws \CRM_Core_Exception
    */
-  public static function contactSettings($contact_id) {
+  public static function contactSettings($contact_id): SettingsBag {
     // For CiviCRM 5.7+ we can use the new Civi::contactSettings() facade.
     if (version_compare(CRM_Utils_System::version(), '5.7', '<')) {
       $settings = Civi::service('settings_manager')
+        /** @phpstan-ignore method.nonObject */
         ->getBagByContact(NULL, $contact_id);
     }
     else {
-      $settings = Civi::contactSettings($contact_id);
+      $settings = Civi::contactSettings((int) $contact_id);
     }
 
     return $settings;

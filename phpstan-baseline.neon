@@ -1,0 +1,37 @@
+parameters:
+	ignoreErrors:
+		-
+			message: '#^Function signatures_civicrm_tokenValues\(\) has parameter \$cids with no type specified\.$#'
+			identifier: missingType.parameter
+			count: 1
+			path: signatures.php
+
+		-
+			message: '#^Function signatures_civicrm_tokenValues\(\) has parameter \$context with no type specified\.$#'
+			identifier: missingType.parameter
+			count: 1
+			path: signatures.php
+
+		-
+			message: '#^Function signatures_civicrm_tokenValues\(\) has parameter \$job with no type specified\.$#'
+			identifier: missingType.parameter
+			count: 1
+			path: signatures.php
+
+		-
+			message: '#^Function signatures_civicrm_tokenValues\(\) has parameter \$tokens with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: signatures.php
+
+		-
+			message: '#^Function signatures_civicrm_tokenValues\(\) has parameter \$values with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: signatures.php
+
+		-
+			message: '#^Function signatures_civicrm_tokens\(\) has parameter \$tokens with no value type specified in iterable type array\.$#'
+			identifier: missingType.iterableValue
+			count: 1
+			path: signatures.php

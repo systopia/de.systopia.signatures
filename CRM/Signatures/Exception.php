@@ -14,7 +14,7 @@
 | written permission from the original author(s).             |
 +-------------------------------------------------------------*/
 
-use CRM_Signatures_ExtensionUtil as E;
+declare(strict_types = 1);
 
 /**
  * CRM_Signatures_Signatures objects are sets of signatures for a contact.
@@ -22,29 +22,34 @@ use CRM_Signatures_ExtensionUtil as E;
 class CRM_Signatures_Exception extends Exception {
 
   /**
-   * @var array $extraParams
+   * @var array<string, mixed>
    *   Additional parameters.
    */
-  protected $extraParams;
+  protected array $extraParams;
 
   /**
    * CRM_Signatures_Exception constructor.
    *
    * @param string $message
    * @param string $code
-   * @param array $extraParams
-   * @param \Throwable | NULL $previous
+   * @param array<string, mixed> $extraParams
+   * @param Throwable | NULL $previous
    */
-  function __construct(string $message = '', string $code = '', array $extraParams = array(), \Throwable $previous = NULL) {
-    parent::__construct($message, NULL, $previous);
+  public function __construct(
+    string $message = '',
+    string $code = '',
+    array $extraParams = [],
+    ?Throwable $previous = NULL
+  ) {
+    parent::__construct($message, 0, $previous);
     $this->code = $code;
     $this->extraParams = $extraParams;
   }
 
   /**
-   * @return array
+   * @return array<string, mixed>
    */
-  public function getExtraParams() {
+  public function getExtraParams(): array {
     return $this->extraParams;
   }
 

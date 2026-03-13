@@ -12,13 +12,13 @@
     <url desc="Main Extension Page">https://github.com/systopia/de.systopia.signatures</url>
     <url desc="Documentation">https://docs.civicrm.org/signatures/en/latest/</url>
     <url desc="Support">https://github.com/systopia/de.systopia.signatures/issues</url>
-    <url desc="Licensing">http://www.gnu.org/licenses/agpl-3.0.html</url>
+    <url desc="Licensing">https://www.gnu.org/licenses/agpl-3.0.html</url>
   </urls>
   <releaseDate></releaseDate>
   <version>1.4.0-dev</version>
   <develStage>dev</develStage>
   <compatibility>
-    <ver>5.45</ver>
+    <ver>5.76</ver>
   </compatibility>
   <comments/>
   <civix>

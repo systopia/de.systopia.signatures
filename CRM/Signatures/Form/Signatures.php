@@ -14,6 +14,8 @@
 | written permission from the original author(s).             |
 +-------------------------------------------------------------*/
 
+declare(strict_types = 1);
+
 use CRM_Signatures_ExtensionUtil as E;
 
 /**
@@ -24,7 +26,7 @@ use CRM_Signatures_ExtensionUtil as E;
 class CRM_Signatures_Form_Signatures extends CRM_Core_Form {
 
   /**
-   * @var \CRM_Signatures_Signatures $signatures
+   * @var \CRM_Signatures_Signatures
    *   The set of signatures for the contact.
    */
   protected $signatures;
@@ -32,10 +34,14 @@ class CRM_Signatures_Form_Signatures extends CRM_Core_Form {
   /**
    * Builds the form.
    */
-  public function buildQuickForm() {
-    $contact_id = $this->setContactID();
+  public function buildQuickForm(): void {
+    $contact_id = (string) $this->setContactID();
 
-    if (!$this->signatures = CRM_Signatures_Signatures::getSignatures($contact_id)) {
+    $signatures = CRM_Signatures_Signatures::getSignatures($contact_id);
+    if (NULL !== $signatures) {
+      $this->signatures = $signatures;
+    }
+    else {
       $this->signatures = new CRM_Signatures_Signatures($contact_id);
     }
 
@@ -43,62 +49,64 @@ class CRM_Signatures_Form_Signatures extends CRM_Core_Form {
     $this->add(
       'wysiwyg',
       'signature_letter_html',
-      E::ts('Letter signature (HTML)', array('domain' => 'de.systopia.signatures'))
+      E::ts('Letter signature (HTML)')
     );
     $this->add(
       'wysiwyg',
       'signature_email_html',
-      E::ts('E-mail signature (HTML)', array('domain' => 'de.systopia.signatures'))
+      E::ts('E-mail signature (HTML)')
     );
     $this->add(
       'textarea',
       'signature_email_plain',
-      E::ts('E-mail signature (plain text)', array('domain' => 'de.systopia.signatures'))
+      E::ts('E-mail signature (plain text)')
     );
     $this->add(
       'wysiwyg',
       'signature_mass_mailing_html',
-      E::ts('Mass mailing signature (HTML)', array('domain' => 'de.systopia.signatures'))
+      E::ts('Mass mailing signature (HTML)')
     );
     $this->add(
       'textarea',
       'signature_mass_mailing_plain',
-      E::ts('Mass mailing signature (plain text)', array('domain' => 'de.systopia.signatures'))
+      E::ts('Mass mailing signature (plain text)')
     );
     $this->add(
       'wysiwyg',
       'signature_additional_html',
-      E::ts('Additional signature (HTML)', array('domain' => 'de.systopia.signatures'))
+      E::ts('Additional signature (HTML)')
     );
     $this->add(
       'textarea',
       'signature_additional_plain',
-      E::ts('Additional signature (plain text)', array('domain' => 'de.systopia.signatures'))
+      E::ts('Additional signature (plain text)')
     );
 
-    $this->addButtons(array(
-      array(
+    $this->addButtons([
+      [
         'type' => 'submit',
         'name' => E::ts('Submit'),
         'isDefault' => TRUE,
-      ),
-    ));
+      ],
+    ]);
 
     // Export form elements.
     $this->assign('elementNames', $this->getRenderableElementNames());
     $this->assign('contactID', $contact_id);
-    $this->assign('header', E::ts('You are editing signatures for the contact with the ID <em>%1</em>', array(
-      'domain' => 'de.systopia.signatures',
-      1 => $contact_id,
-    )));
+    $this->assign('header', E::ts(
+      'You are editing signatures for the contact with the ID <em>%1</em>',
+      [1 => $contact_id]
+    ));
 
     parent::buildQuickForm();
   }
 
   /**
    * Set the default values (signatures' current data) in the form.
+   *
+   * @return array<string, string>
    */
-  public function setDefaultValues() {
+  public function setDefaultValues(): array {
     $defaults = parent::setDefaultValues();
 
     $defaults['contact_id'] = $this->signatures->getContactID();
@@ -113,9 +121,9 @@ class CRM_Signatures_Form_Signatures extends CRM_Core_Form {
    *
    * @return bool
    */
-  public function validate() {
+  public function validate(): bool {
     $values = $this->exportValues();
-    $contact_id = $this->getContactID();
+    $contact_id = (string) $this->getContactID();
 
     try {
       $this->signatures->setContactID($contact_id);
@@ -127,6 +135,7 @@ class CRM_Signatures_Form_Signatures extends CRM_Core_Form {
       $this->signatures->verifySignatures();
     }
     catch (Exception $exception) {
+      // @ignoreException
       switch ($exception->getCode()) {
         case 'signatures_too_long':
           $this->setElementError(
@@ -134,6 +143,7 @@ class CRM_Signatures_Form_Signatures extends CRM_Core_Form {
             E::ts('The signatures are too long. Please shorten at least one signature.')
           );
           break;
+
         default:
           $this->setElementError(
             'buttons',
@@ -149,9 +159,9 @@ class CRM_Signatures_Form_Signatures extends CRM_Core_Form {
   /**
    * Processes the submitted form.
    */
-  public function postProcess() {
+  public function postProcess(): void {
     $values = $this->exportValues();
-    $contact_id = $this->getContactID();
+    $contact_id = (string) $this->getContactID();
 
     $this->signatures->setContactID($contact_id);
     foreach ($this->signatures->getData() as $signature_name => $signature_body) {
@@ -167,18 +177,18 @@ class CRM_Signatures_Form_Signatures extends CRM_Core_Form {
   /**
    * Get the fields/elements defined in this form.
    *
-   * @return array (string)
+   * @return list<string>
    */
-  public function getRenderableElementNames() {
+  public function getRenderableElementNames(): array {
     // The _elements list includes some items which should not be
     // auto-rendered in the loop -- such as "qfKey" and "buttons".  These
     // items don't have labels.  We'll identify renderable by filtering on
     // the 'label'.
-    $elementNames = array();
+    $elementNames = [];
     foreach ($this->_elements as $element) {
-      /** @var HTML_QuickForm_Element $element */
+      /** @var HTML_QuickForm_element $element */
       $label = $element->getLabel();
-      if (!empty($label)) {
+      if ('' !== $label) {
         $elementNames[] = $element->getName();
       }
     }
