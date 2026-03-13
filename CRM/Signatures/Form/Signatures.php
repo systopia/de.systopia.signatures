@@ -49,37 +49,37 @@ class CRM_Signatures_Form_Signatures extends CRM_Core_Form {
     $this->add(
       'wysiwyg',
       'signature_letter_html',
-      E::ts('Letter signature (HTML)', ['domain' => 'de.systopia.signatures'])
+      E::ts('Letter signature (HTML)')
     );
     $this->add(
       'wysiwyg',
       'signature_email_html',
-      E::ts('E-mail signature (HTML)', ['domain' => 'de.systopia.signatures'])
+      E::ts('E-mail signature (HTML)')
     );
     $this->add(
       'textarea',
       'signature_email_plain',
-      E::ts('E-mail signature (plain text)', ['domain' => 'de.systopia.signatures'])
+      E::ts('E-mail signature (plain text)')
     );
     $this->add(
       'wysiwyg',
       'signature_mass_mailing_html',
-      E::ts('Mass mailing signature (HTML)', ['domain' => 'de.systopia.signatures'])
+      E::ts('Mass mailing signature (HTML)')
     );
     $this->add(
       'textarea',
       'signature_mass_mailing_plain',
-      E::ts('Mass mailing signature (plain text)', ['domain' => 'de.systopia.signatures'])
+      E::ts('Mass mailing signature (plain text)')
     );
     $this->add(
       'wysiwyg',
       'signature_additional_html',
-      E::ts('Additional signature (HTML)', ['domain' => 'de.systopia.signatures'])
+      E::ts('Additional signature (HTML)')
     );
     $this->add(
       'textarea',
       'signature_additional_plain',
-      E::ts('Additional signature (plain text)', ['domain' => 'de.systopia.signatures'])
+      E::ts('Additional signature (plain text)')
     );
 
     $this->addButtons([
@@ -93,10 +93,10 @@ class CRM_Signatures_Form_Signatures extends CRM_Core_Form {
     // Export form elements.
     $this->assign('elementNames', $this->getRenderableElementNames());
     $this->assign('contactID', $contact_id);
-    $this->assign('header', E::ts('You are editing signatures for the contact with the ID <em>%1</em>', [
-      'domain' => 'de.systopia.signatures',
-      1 => $contact_id,
-    ]));
+    $this->assign('header', E::ts(
+      'You are editing signatures for the contact with the ID <em>%1</em>',
+      [1 => $contact_id]
+    ));
 
     parent::buildQuickForm();
   }

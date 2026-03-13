@@ -180,27 +180,13 @@ class CRM_Signatures_Signatures {
    */
   public static function allowedSignatures(): array {
     return [
-      'signature_letter_html' => E::ts(
-        'Letter signature (HTML)', ['domain' => 'de.systopia.signatures']
-      ),
-      'signature_email_html' => E::ts(
-        'E-mail signature (HTML)', ['domain' => 'de.systopia.signatures']
-      ),
-      'signature_email_plain' => E::ts(
-        'E-mail signature (plain text)', ['domain' => 'de.systopia.signatures']
-      ),
-      'signature_mass_mailing_html' => E::ts(
-        'Mass mailing signature (HTML)', ['domain' => 'de.systopia.signatures']
-      ),
-      'signature_mass_mailing_plain' => E::ts(
-        'Mass mailing signature (plain text)', ['domain' => 'de.systopia.signatures']
-      ),
-      'signature_additional_html' => E::ts(
-        'Additional signature (HTML)', ['domain' => 'de.systopia.signatures']
-      ),
-      'signature_additional_plain' => E::ts(
-        'Additional signature (plain text)', ['domain' => 'de.systopia.signatures']
-      ),
+      'signature_letter_html' => E::ts('Letter signature (HTML)'),
+      'signature_email_html' => E::ts('E-mail signature (HTML)'),
+      'signature_email_plain' => E::ts('E-mail signature (plain text)'),
+      'signature_mass_mailing_html' => E::ts('Mass mailing signature (HTML)'),
+      'signature_mass_mailing_plain' => E::ts('Mass mailing signature (plain text)'),
+      'signature_additional_html' => E::ts('Additional signature (HTML)'),
+      'signature_additional_plain' => E::ts('Additional signature (plain text)'),
     ];
   }
 

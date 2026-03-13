@@ -54,7 +54,7 @@ function signatures_civicrm_enable(): void {
  */
 function signatures_civicrm_navigationMenu(&$menu): void {
   _signatures_civix_insert_navigation_menu($menu, 'Contacts', [
-    'label' => E::ts('Signatures', ['domain' => 'de.systopia.signatures']),
+    'label' => E::ts('Signatures'),
     'name' => 'signatures',
     'url' => 'civicrm/contact/signatures',
     'permission' => 'access CiviCRM',
