@@ -111,11 +111,9 @@ class CRM_Signatures_Upgrader extends CRM_Extension_Upgrader_Base {
    *
    * @see https://stackoverflow.com/a/34224433
    *
-   * @param list<string> $matches
-   *
-   * @return string
+   * @phpstan-param array<string> $matches
    */
-  public static function fix_str_length($matches): string {
+  public static function fix_str_length(array $matches): string {
     $string = $matches[2];
     // yes, strlen even for UTF-8 characters, PHP wants the mem size, not the char count
     $right_length = strlen($string);
@@ -147,7 +145,6 @@ class CRM_Signatures_Upgrader extends CRM_Extension_Upgrader_Base {
     foreach ($tab as $line) {
       $new_data .= preg_replace_callback(
         '%\bs:(\d+):"(.*)%',
-        // @phpstan-ignore-next-line
         [
           static::class,
           'fix_str_length',
