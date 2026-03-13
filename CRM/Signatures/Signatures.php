@@ -14,6 +14,8 @@
 | written permission from the original author(s).             |
 +-------------------------------------------------------------*/
 
+declare(strict_types = 1);
+
 use CRM_Signatures_ExtensionUtil as E;
 
 /**
@@ -22,22 +24,22 @@ use CRM_Signatures_ExtensionUtil as E;
 class CRM_Signatures_Signatures {
 
   /**
-   * @var \CRM_Signatures_Signatures[] $_signatures
+   * @var \CRM_Signatures_Signatures[]
    *   Caches the list of sets of signatures.
    */
-  protected static $_signatures = NULL;
+  protected static ?array $_signatures = NULL;
 
   /**
-   * @var string $contact_id
+   * @var string
    *   The contact's ID the signatures belong to.
    */
-  protected $contact_id = NULL;
+  protected string $contact_id;
 
   /**
-   * @var array $data
+   * @var array<string, mixed>|NULL
    *   The signatures data.
    */
-  protected $data = NULL;
+  protected ?array $data = NULL;
 
   /**
    * CRM_Signatures_Signatures constructor.
@@ -46,9 +48,10 @@ class CRM_Signatures_Signatures {
    *   The contact's ID.
    * @param array $data
    *   The signatures data.
+   * @phpstan-ignore missingType.iterableValue
    */
-  public function __construct($contact_id, $data = array()) {
-    $this->contact_id = $contact_id;
+  public function __construct($contact_id, $data = []) {
+    $this->contact_id = (string) $contact_id;
     $allowed_signatures = array_keys(self::allowedSignatures());
     $this->data = $data + array_combine(
         $allowed_signatures,
@@ -60,9 +63,10 @@ class CRM_Signatures_Signatures {
    * Retrieves all signatures for the current set of signatures.
    *
    * @return array
+   * @phpstan-ignore missingType.iterableValue
    */
-  public function getData() {
-    return $this->data;
+  public function getData(): array {
+    return (array) $this->data;
   }
 
   /**
@@ -70,16 +74,16 @@ class CRM_Signatures_Signatures {
    *
    * @return string
    */
-  public function getContactID() {
+  public function getContactID(): string {
     return $this->contact_id;
   }
 
   /**
    * Sets the contact ID.
    *
-   * @param $contact_id
+   * @param string $contact_id
    */
-  public function setContactID($contact_id) {
+  public function setContactID($contact_id): void {
     $this->contact_id = $contact_id;
   }
 
@@ -90,13 +94,12 @@ class CRM_Signatures_Signatures {
    *
    * @return mixed | NULL
    */
-  public function getSignature($signature_name) {
+  public function getSignature($signature_name): mixed {
     if (isset($this->data[$signature_name])) {
       return $this->data[$signature_name];
     }
-    else {
-      return NULL;
-    }
+
+    return NULL;
   }
 
   /**
@@ -108,14 +111,14 @@ class CRM_Signatures_Signatures {
    * @throws \CRM_Signatures_Exception
    *   When the signature name is not known.
    */
-  public function setSignature($signature_name, $signature_body) {
-    if (!in_array($signature_name, array_keys(self::allowedSignatures()))) {
+  public function setSignature($signature_name, $signature_body): void {
+    if (!array_key_exists($signature_name, self::allowedSignatures())) {
       throw new CRM_Signatures_Exception(
-        E::ts('Unknown signature name %1', array(1 => $signature_name)),
+        E::ts('Unknown signature name %1', [1 => $signature_name]),
         'signatures_unknown_signature',
-        array(
+        [
           'signature_name' => $signature_name,
-        )
+        ]
       );
     }
     // TODO: Check if value is acceptable.
@@ -128,11 +131,11 @@ class CRM_Signatures_Signatures {
    * @throws \CRM_Signatures_Exception
    *   When the signatures could not be successfully validated.
    */
-  public function verifySignatures() {
+  public function verifySignatures(): void {
     // Serialize and check for allowed database column length. The MySQL data
     // type for settings data is TEXT, which allows 2^16 bytes for the actual
     // value.
-    $blob = serialize((object)$this->getData());
+    $blob = serialize((object) $this->getData());
     if (strlen($blob) > pow(2, 16)) {
       throw new CRM_Signatures_Exception(
         E::ts('Signatures data is too long.'),
@@ -146,10 +149,10 @@ class CRM_Signatures_Signatures {
    *
    * @throws \CRM_Signatures_Exception
    */
-  public function saveSignatures() {
+  public function saveSignatures(): void {
     self::$_signatures[$this->getContactID()] = $this;
     $this->verifySignatures();
-    $signatures_data = array();
+    $signatures_data = [];
     foreach ($this->getData() as $signature_name => $signature) {
       $signatures_data[$signature_name] = base64_encode($signature);
     }
@@ -161,7 +164,7 @@ class CRM_Signatures_Signatures {
   /**
    * Deletes the signatures from the CiviCRM settings.
    */
-  public function deleteSignatures() {
+  public function deleteSignatures(): void {
     if (isset(self::$_signatures[$this->getContactID()])) {
       unset(self::$_signatures[$this->getContactID()]);
       CRM_Signatures_Utils::contactSettings($this->getContactID())
@@ -173,41 +176,60 @@ class CRM_Signatures_Signatures {
    * Returns an array of allowed signature names.
    *
    * @return array
+   * @phpstan-ignore missingType.iterableValue
    */
-  public static function allowedSignatures() {
-    return array(
-      'signature_letter_html' => E::ts('Letter signature (HTML)', array('domain' => 'de.systopia.signatures')),
-      'signature_email_html' => E::ts('E-mail signature (HTML)', array('domain' => 'de.systopia.signatures')),
-      'signature_email_plain' => E::ts('E-mail signature (plain text)', array('domain' => 'de.systopia.signatures')),
-      'signature_mass_mailing_html' => E::ts('Mass mailing signature (HTML)', array('domain' => 'de.systopia.signatures')),
-      'signature_mass_mailing_plain' => E::ts('Mass mailing signature (plain text)', array('domain' => 'de.systopia.signatures')),
-      'signature_additional_html' => E::ts('Additional signature (HTML)', array('domain' => 'de.systopia.signatures')),
-      'signature_additional_plain' => E::ts('Additional signature (plain text)', array('domain' => 'de.systopia.signatures')),
-    );
+  public static function allowedSignatures(): array {
+    return [
+      'signature_letter_html' => E::ts(
+        'Letter signature (HTML)', ['domain' => 'de.systopia.signatures']
+      ),
+      'signature_email_html' => E::ts(
+        'E-mail signature (HTML)', ['domain' => 'de.systopia.signatures']
+      ),
+      'signature_email_plain' => E::ts(
+        'E-mail signature (plain text)', ['domain' => 'de.systopia.signatures']
+      ),
+      'signature_mass_mailing_html' => E::ts(
+        'Mass mailing signature (HTML)', ['domain' => 'de.systopia.signatures']
+      ),
+      'signature_mass_mailing_plain' => E::ts(
+        'Mass mailing signature (plain text)', ['domain' => 'de.systopia.signatures']
+      ),
+      'signature_additional_html' => E::ts(
+        'Additional signature (HTML)', ['domain' => 'de.systopia.signatures']
+      ),
+      'signature_additional_plain' => E::ts(
+        'Additional signature (plain text)', ['domain' => 'de.systopia.signatures']
+      ),
+    ];
   }
 
   /**
    * Retrieves the signatures for the given contact ID.
    *
-   * @param $contact_id
+   * @param string $contact_id
    *
    * @return CRM_Signatures_Signatures | NULL
    */
-  public static function getSignatures($contact_id) {
+  public static function getSignatures($contact_id): ?CRM_Signatures_Signatures {
     if (!isset(self::$_signatures[$contact_id])) {
-      $signatures_data = array();
+      $signatures_data = [];
       try {
         $signatures_raw = CRM_Signatures_Utils::contactSettings($contact_id)
           ->get('signatures_signatures');
-        if (!empty($signatures_raw)) {
+        if (is_iterable($signatures_raw)) {
           foreach ($signatures_raw as $signature_name => $signature_raw) {
-            $signatures_data[$signature_name] = base64_decode($signature_raw);
+            $signatures_data[$signature_name] = base64_decode($signature_raw, TRUE);
           }
         }
       }
       catch (Exception $exception) {
         // There is no contact with that ID.
-        Civi::log()->debug("Signature Extension: Contact ID '{$contact_id}' caused exception: " . $exception->getMessage());
+        // @ignoreException
+        Civi::log()
+          ->debug(
+            "Signature Extension: Contact ID '{$contact_id}' caused exception: " . $exception->getMessage()
+          );
       }
       self::$_signatures[$contact_id] = new self($contact_id, $signatures_data);
     }

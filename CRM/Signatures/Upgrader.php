@@ -14,6 +14,8 @@
 | written permission from the original author(s).             |
 +-------------------------------------------------------------*/
 
+declare(strict_types = 1);
+
 use CRM_Signatures_ExtensionUtil as E;
 
 /**
@@ -39,21 +41,22 @@ class CRM_Signatures_Upgrader extends CRM_Extension_Upgrader_Base {
     );
 
     // Try to unserialize original string.
-    $all_signatures = unserialize($value);
+    $all_signatures = unserialize((string) $value);
 
     // In case of failure try to repair it.
-    if($all_signatures === FALSE){
-      $repairedSerialization = static::fix_serialized($value);
-      $all_signatures = unserialize($repairedSerialization);
+    if ($all_signatures === FALSE) {
+      $repairedSerialization = static::fix_serialized((string) $value);
+      if (!is_array($repairedSerialization)) {
+        $all_signatures = unserialize((string) $repairedSerialization);
+      }
     }
 
-    if (!empty($all_signatures)) {
-      $all_signatures = (array) $all_signatures;
+    if (is_array($all_signatures) && $all_signatures !== []) {
       foreach ($all_signatures as $contact_id => $signatures) {
         try {
-          $signatures_object = new CRM_Signatures_Signatures($contact_id, $signatures);
+          $signatures_object = new CRM_Signatures_Signatures($contact_id, (array) $signatures);
           $signatures_object->verifySignatures();
-          $signatures_data = array();
+          $signatures_data = [];
           foreach ($signatures_object->getData() as $signature_name => $signature) {
             $signatures_data[$signature_name] = base64_encode($signature);
           }
@@ -61,10 +64,11 @@ class CRM_Signatures_Upgrader extends CRM_Extension_Upgrader_Base {
             ->set('signatures_signatures', $signatures_data);
         }
         catch (Exception $exception) {
+          // @ignoreException
           CRM_Core_Session::setStatus(
             E::ts(
               'Could not process signatures for contact with ID %1. You may have to re-create them manually.',
-              array(1 => $contact_id)
+              [1 => $contact_id]
             ),
             E::ts('Signatures database upgrade'),
             'error'
@@ -86,64 +90,70 @@ class CRM_Signatures_Upgrader extends CRM_Extension_Upgrader_Base {
    *
    * @link https://civicrm.org/advisory/civi-sa-2019-21-poi-saved-search-and-report-instance-apis
    */
-  public function upgrade_5011() {
+  public function upgrade_5011(): bool {
     // Do not use CRM_Core_BAO::getItem() or Civi::settings()->get().
     // Extract and unserialize directly from the database.
+    /** @var CRM_Core_DAO $signatures_query */
     $signatures_query = CRM_Core_DAO::executeQuery("
         SELECT `value`, `contact_id`
           FROM `civicrm_setting`
         WHERE `name` = 'signatures_signatures';");
     while ($signatures_query->fetch()) {
-      $signatures_record = unserialize($signatures_query->value);
+      $signatures_record = unserialize($signatures_query->value, ['allowed_classes' => FALSE]);
       CRM_Signatures_Utils::contactSettings($signatures_query->contact_id)
         ->set('signatures_signatures', (array) $signatures_record);
     }
-
     return TRUE;
   }
 
   /**
    * Utility function for fixing wrong byte lengths in serialization strings.
    *
-   * @see https://stackoverflow.com/a/34224433.
+   * @see https://stackoverflow.com/a/34224433
    *
-   * @param $matches
+   * @param list<string> $matches
    *
    * @return string
    */
-  public static function fix_str_length($matches) {
+  public static function fix_str_length($matches): string {
     $string = $matches[2];
-    $right_length = strlen($string); // yes, strlen even for UTF-8 characters, PHP wants the mem size, not the char count
+    // yes, strlen even for UTF-8 characters, PHP wants the mem size, not the char count
+    $right_length = strlen($string);
     return 's:' . $right_length . ':"' . $string . '";';
   }
 
   /**
    * Utility function for repairing corrupted serialization strings.
    *
-   * @see https://stackoverflow.com/a/34224433.
+   * @see https://stackoverflow.com/a/34224433
    *
-   * @param $string
+   * @param string $string
    *
    * @return null|string|string[]
    */
-  public static function fix_serialized($string) {
+  public static function fix_serialized($string): array|string|null {
     // securities
-    if (!preg_match('/^[aOs]:/', $string)) {
+    if (FALSE === preg_match('/^[aOs]:/', $string)) {
       return $string;
     }
     if (@unserialize($string) !== FALSE) {
       return $string;
     }
-    $string = preg_replace("%\n%", "", $string);
+    $string = preg_replace("%\n%", '', $string);
     // doublequote exploding
-    $data = preg_replace('%";%', "µµµ", $string);
-    $tab = explode("µµµ", $data);
+    $data = preg_replace('%";%', 'µµµ', (string) $string);
+    $tab = explode('µµµ', (string) $data);
     $new_data = '';
     foreach ($tab as $line) {
-      $new_data .= preg_replace_callback('%\bs:(\d+):"(.*)%', array(
-        static::class,
-        'fix_str_length',
-      ), $line);
+      $new_data .= preg_replace_callback(
+        '%\bs:(\d+):"(.*)%',
+        // @phpstan-ignore-next-line
+        [
+          static::class,
+          'fix_str_length',
+        ],
+        $line
+      );
     }
     return $new_data;
   }
